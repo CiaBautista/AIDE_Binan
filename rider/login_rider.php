@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 function generateOTP($length = 6) {
-    return str_pad(random_int(0, pow(10, $length)-1), $length, '0', STR_PAD_LEFT);
+    return str_pad(random_int(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
 }
 
 function decrypt_data($encrypted_data, $key) {
@@ -16,56 +16,49 @@ function decrypt_data($encrypted_data, $key) {
 
 $encryption_key = "your-strong-secret-key";
 $error = "";
-$step = "login"; 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['email']) && isset($_POST['password'])) {
-        $input_email = $_POST['email'];
-        $input_password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'])) {
+    $input_email = $_POST['email'];
+    $input_password = $_POST['password'];
 
-        $conn = new mysqli("localhost", "root", "", "aide_binan");
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+    $conn = new mysqli("localhost", "root", "", "aide_binan");
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
-        $query = "SELECT email, password_hash FROM rider_users";
-        $result = $conn->query($query);
+    $query = "SELECT email, password_hash FROM rider_users";
+    $result = $conn->query($query);
 
-        $found = false;
-        while ($row = $result->fetch_assoc()) {
-            $decrypted_email = decrypt_data($row['email'], $encryption_key);
-            if ($input_email === $decrypted_email) {
-                $found = true;
-                if (password_verify($input_password, $row['password_hash'])) {
-                    $otp = generateOTP();
-                    $_SESSION['rider_email'] = $input_email;
-                    $_SESSION['rider_otp'] = $otp;
-                    $step = "otp"; 
-                } else {
-                    $error = "Incorrect password.";
-                }
-                break;
+    $found = false;
+    while ($row = $result->fetch_assoc()) {
+        $decrypted_email = decrypt_data($row['email'], $encryption_key);
+
+        if ($input_email === $decrypted_email) {
+            $found = true;
+
+            if (password_verify($input_password, $row['password_hash'])) {
+              
+                $otp = generateOTP();
+                $_SESSION['rider_email'] = $input_email;
+                $_SESSION['rider_otp'] = $otp;
+
+              
+                echo "<script>alert('OTP for testing: $otp'); window.location.href = 'login_otp_rider.php';</script>";
+                $conn->close();
+                exit();
+            } else {
+                $error = "Incorrect password.";
             }
-        }
 
-        if (!$found) {
-            $error = "Email not found.";
-        }
-
-        $conn->close();
-    } elseif (isset($_POST['otp'])) {
-        $enteredOtp = $_POST['otp'];
-        $correctOtp = $_SESSION['rider_otp'] ?? '';
-
-        if ($enteredOtp === $correctOtp) {
-            unset($_SESSION['rider_otp']); 
-            echo "<script>alert('OTP Verified! Redirecting...'); window.location.href = 'dashboard.php';</script>";
-            exit();
-        } else {
-            $error = "Invalid OTP. Please try again.";
-            $step = "otp";
+            break;
         }
     }
+
+    if (!$found) {
+        $error = "Email not found.";
+    }
+
+    $conn->close();
 }
 ?>
 
@@ -73,13 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title><?php echo $step === 'login' ? 'Rider Login' : 'Verify OTP'; ?> - AIDE Biñan</title>
+    <title>Rider Login - AIDE Biñan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             background: linear-gradient(135deg, #fde0e0, #ffe8e8);
             font-family: Arial, sans-serif;
-            overflow: hidden;
         }
         .blur-circle {
             position: absolute;
@@ -109,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="blur-circle circle2"></div>
 
     <header class="bg-red-900 text-white px-6 py-4 flex justify-between items-center relative z-10">
-        <h1 class="text-xl font-bold">?? A.I.D.E. BIÑAN</h1>
+        <h1 class="text-xl font-bold">A.I.D.E. BIÑAN</h1>
         <nav class="space-x-6">
             <a href="#" class="hover:underline">Home</a>
             <a href="#" class="hover:underline">About</a>
@@ -118,27 +110,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <section class="flex flex-col items-center justify-center min-h-screen relative z-10">
         <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md backdrop-blur-md bg-opacity-90">
-            <?php if ($step === 'login'): ?>
-                <h2 class="text-2xl font-bold text-center mb-2 text-gray-800">Rider Login</h2>
-                <form method="POST" class="space-y-4">
-                    <input type="email" name="email" placeholder="Email" required class="w-full border px-4 py-2 rounded focus:outline-none">
-                    <input type="password" name="password" placeholder="Password" required class="w-full border px-4 py-2 rounded focus:outline-none">
-                    <button type="submit" class="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Login</button>
-                </form>
-            <?php else: ?>
-                <h2 class="text-2xl font-bold text-center mb-2 text-gray-800">OTP Verification</h2>
-                <p class="text-center text-gray-500 mb-6">Enter the OTP sent to your email</p>
-                <form method="POST" class="space-y-4">
-                    <input type="text" name="otp" maxlength="6" placeholder="One-Time Password" required class="w-full border px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-red-500">
-                    <button type="submit" class="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Verify OTP</button>
-                    <p class="text-center text-sm mt-4 text-gray-600">
-                        Didn't receive the OTP? <a href="#" class="text-red-600 hover:underline">Resend</a>
-                    </p>
-                </form>
-                <script>
-                    alert("OTP for testing: <?= $_SESSION['rider_otp'] ?? '' ?>");
-                </script>
-            <?php endif; ?>
+            <h2 class="text-2xl font-bold text-center mb-2 text-gray-800">Rider Login</h2>
+            <form method="POST" class="space-y-4">
+                <input type="email" name="email" placeholder="Email" required class="w-full border px-4 py-2 rounded focus:outline-none">
+                <input type="password" name="password" placeholder="Password" required class="w-full border px-4 py-2 rounded focus:outline-none">
+                <button type="submit" class="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Login</button>
+            </form>
 
             <?php if (!empty($error)): ?>
                 <div class="bg-red-100 text-red-700 border border-red-300 p-2 rounded mt-4 text-center">

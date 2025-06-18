@@ -1,18 +1,3 @@
-<?php
-session_start();
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $enteredOtp = $_POST['otp'] ?? '';
-    $correctOtp = $_SESSION['admin_otp'] ?? '';
-
-    if ($enteredOtp === $correctOtp) {
-        unset($_SESSION['admin_otp']);
-        header("Location: dashboard_admin.php");
-        exit();
-    } else {
-        echo "<p style='color:red;'>Invalid OTP.</p>";
-    }
-}
-?>
 <?php session_start(); ?>
 
 <!DOCTYPE html>
@@ -22,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin OTP Verification - AIDE Biñan</title>
     <style>
         body {
-            background-color: #fef2f2; /* light red background */
+            background-color: #fef2f2;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -33,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #000;
         }
         .otp-container {
-            background: #fff; /* white form background */
+            background: #fff; 
             border-radius: 12px;
             padding: 40px;
             max-width: 500px;
@@ -137,3 +122,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit" name="verify">Verify</button>
     </form>
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['verify'])) {
+    $entered_otp = $_POST['entered_otp'];
+
+    if (!isset($_SESSION['admin_otp'])) {
+        echo "<div class='message error'>OTP session expired or invalid access.</div>";
+        exit;
+    }
+
+    if ($entered_otp === $_SESSION['admin_otp']) {
+        echo "<div class='message success'>OTP verified successfully! Your admin account is now activated.</div>";
+        
+        
+        unset($_SESSION['admin_otp']);
+        unset($_SESSION['admin_email']);
+
+        echo "<a href='login_admin.php'>Click here to login</a>";
+    } else {
+        echo "<div class='message error'>Invalid OTP. Please try again.</div>";
+    }
+}
+?>
+
+</div>
+</body>
+</html>

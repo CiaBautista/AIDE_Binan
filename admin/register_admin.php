@@ -31,7 +31,7 @@
                 box-shadow: 0 0 25px rgba(255, 0, 0, 0.6), 0 0 50px rgba(255, 0, 0, 0.4), 0 0 75px rgba(255, 0, 0, 0.2);
             }
             to {
-                box-shadow: 0 0 35px rgba(255, 100, 100, 0.😎, 0 0 60px rgba(255, 100, 100, 0.5), 0 0 90px rgba(255, 100, 100, 0.3);
+                box-shadow: 0 0 35px rgba(255, 100, 100, 0.8), 0 0 60px rgba(255, 100, 100, 0.5), 0 0 90px rgba(255, 100, 100, 0.3);
             }
         }
         .logo {
@@ -150,7 +150,9 @@
             <button type="submit" name="submit">Register as Admin</button>
         </div>
     </form>
+
 <?php
+// FUNCTIONS
 function encrypt_data($data, $key) {
     $iv = openssl_random_pseudo_bytes(16);
     $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
@@ -168,6 +170,7 @@ function generateOTP($length = 6) {
     return str_pad(random_int(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
 }
 
+// PROCESS FORM
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = ucwords(strtolower(trim($_POST['first_name'])));
     $middle_name = ucwords(strtolower(trim($_POST['middle_name'])));
@@ -184,6 +187,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
+    // MOVE KEY TO CONFIG IN PRODUCTION
     $encryption_key = "your-strong-secret-key";
     $encrypted_email = encrypt_data($email, $encryption_key);
     $encrypted_contact = encrypt_data($contact_number, $encryption_key);
@@ -191,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $conn = new mysqli("localhost", "root", "", "aide_binan");
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        die("Database connection failed.");
     }
 
     $check = $conn->query("SELECT email, contact_number FROM admin_users");
