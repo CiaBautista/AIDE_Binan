@@ -26,7 +26,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 0 15px rgba(220, 38, 38, 0.6), 0 0 30px rgba(220, 38, 38, 0.4); /* glowing border */
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.6), 0 0 30px rgba(220, 38, 38, 0.4); 
             border: 2px solid rgba(220, 38, 38, 0.7);
             transition: box-shadow 0.3s ease, transform 0.2s ease;
         }
