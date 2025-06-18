@@ -119,6 +119,7 @@
                 <input type="password" name="confirm_password" required class="form-input">
             </div>
 
+            <!-- E-bike Info -->
             <div class="col-span-2 section-title">E-Bike Information</div>
 
             <div>
@@ -156,6 +157,171 @@
         </form>
     </div>
 </main>
+<?php
+function encrypt_data($data, $key) {
+    $iv = openssl_random_pseudo_bytes(16);
+    $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
+    return base64_encode($iv . $encrypted);
+}
+
+function decrypt_data($encrypted_data, $key) {
+    $data = base64_decode($encrypted_data);
+    $iv = substr($data, 0, 16);
+    $ciphertext = substr($data, 16);
+    return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
+}
+
+function generateOTP($length = 6) {
+    $digits = '0123456789';
+    $otp = '';
+    for ($i = 0; $i < $length; $i++) {
+        $otp .= $digits[random_int(0, strlen($digits) - 1)];
+    }
+    return $otp;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $first_name = ucwords(strtolower(trim($_POST['first_name'])));
+    $middle_name = ucwords(strtolower(trim($_POST['middle_name'])));
+    $last_name = ucwords(strtolower(trim($_POST['last_name'])));
+    $birthday = $_POST['birthday'];
+    $contact_number = trim($_POST['contact_number']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $first_name = ucwords(strtolower(trim($_POST['first_name'])));
+    $middle_name = ucwords(strtolower(trim($_POST['middle_name'])));
+    $last_name = ucwords(strtolower(trim($_POST['last_name'])));
+    $birthday = $_POST['birthday'];
+    $contact_number = trim($_POST['contact_number']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($birthday)) {
+        echo "<script>alert('Please fill in all required fields.');</script>";
+        return;
+    }
+
+    if (strlen($password) < 8) {
+        echo "<script>alert('Password must be at least 8 characters long.');</script>";
+        return;
+    }
+
+    if (!preg_match('/[A-Z]/', $password)) {
+        echo "<script>alert('Password must contain at least one uppercase letter.');</script>";
+        return;
+    }
+
+    if (!preg_match('/\d/', $password)) {
+        echo "<script>alert('Password must contain at least one number.');</script>";
+        return;
+    }
+
+    if (!preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)) {
+        echo "<script>alert('Password must contain at least one special character.');</script>";
+        return;
+    }
+
+    if ($password !== $confirm_password) {
+        echo "<script>alert('Passwords do not match.');</script>";
+        return;
+    }
+
+    if (!preg_match('/^09[0-9]{9}$/', $contact_number)) {
+    echo "<script>alert('Contact number must be exactly 11 digits, start with 09, and contain numbers only.');</script>";
+    return;
+    }
+
+    if (!empty($birthday)) {
+    $birthDate = DateTime::createFromFormat('Y-m-d', $birthday);
+    $today = new DateTime();
+
+    if (!$birthDate) {
+        echo "<script>alert('Invalid birthday format.');</script>";
+        return;
+    }
+
+    $age = $birthDate->diff($today);
+
+    if ($age->y < 18 || ($age->y == 18 && ($today->format('md') < $birthDate->format('md')))) {
+        echo "<script>alert('You must be at least 18 years old to register.');</script>";
+        return;
+    }
+} else {
+    echo "<script>alert('Birthday is required.');</script>";
+    return;
+}
+
+}
+
+    $ebike_type = "2-wheels";
+    $ebike_model = ucwords(strtolower(trim($_POST['ebike_model'])));
+    $ebike_color = ucwords(strtolower(trim($_POST['ebike_color'])));
+    $ebike_control_number = $_POST['ebike_control_number'];
+    $ebike_purchased = $_POST['ebike_purchased'];
+    $ebike_plate = "";
+
+    if ($password !== $confirm_password) {
+        echo "<script>alert('Passwords do not match.');</script>";
+        exit;
+    }
+
+    $encryption_key = "your-strong-secret-key";
+    $encrypted_email = encrypt_data($email, $encryption_key);
+    $encrypted_contact = encrypt_data($contact_number, $encryption_key);
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+    $conn = new mysqli("localhost", "root", "", "aide_binan");
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $check = $conn->query("SELECT email, contact_number FROM rider_users");
+    while ($row = $check->fetch_assoc()) {
+        $decrypted_email = decrypt_data($row['email'], $encryption_key);
+        $decrypted_contact = decrypt_data($row['contact_number'], $encryption_key);
+        if ($email === $decrypted_email) {
+            echo "<script>alert('Email is already registered. Please use a different email.');</script>";
+            $conn->close();
+            exit;
+        }
+        if ($contact_number === $decrypted_contact) {
+            echo "<script>alert('Contact number is already registered. Please use a different number.');</script>";
+            $conn->close();
+            exit;
+        }
+    }
+
+    $stmt = $conn->prepare("INSERT INTO rider_users 
+        (first_name, middle_name, last_name, birthday, contact_number, email, password_hash, ebike_type, ebike_model, ebike_color, ebike_control_number, ebike_plate, ebike_purchased) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssssssss",
+        $first_name, $middle_name, $last_name, $birthday,
+        $encrypted_contact, $encrypted_email, $password_hash,
+        $ebike_type, $ebike_model, $ebike_color, $ebike_control_number,
+        $ebike_plate, $ebike_purchased
+    );
+
+    if ($stmt->execute()) {
+        $otp = generateOTP();
+        $_SESSION['rider_otp'] = $otp;
+        $_SESSION['rider_email'] = $email;
+
+        echo "<script>
+            alert('Registration successful! OTP: $otp');
+            window.location.href = 'login_rider.php';
+        </script>";
+    } else {
+        echo "<script>alert('Error: " . $stmt->error . "');</script>";
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+?>
 
 </body>
 </html>
