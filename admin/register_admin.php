@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +17,6 @@
             align-items: center;
             color: #fff;
         }
-
         .container {
             max-width: 850px;
             background: rgba(255, 255, 255, 0.95);
@@ -26,29 +26,25 @@
             backdrop-filter: blur(6px);
             animation: glow 4s ease-in-out infinite alternate;
         }
-
         @keyframes glow {
             from {
                 box-shadow: 0 0 25px rgba(255, 0, 0, 0.6), 0 0 50px rgba(255, 0, 0, 0.4), 0 0 75px rgba(255, 0, 0, 0.2);
             }
             to {
-                box-shadow: 0 0 35px rgba(255, 100, 100, 0.8), 0 0 60px rgba(255, 100, 100, 0.5), 0 0 90px rgba(255, 100, 100, 0.3);
+                box-shadow: 0 0 35px rgba(255, 100, 100, 0.😎, 0 0 60px rgba(255, 100, 100, 0.5), 0 0 90px rgba(255, 100, 100, 0.3);
             }
         }
-
         .logo {
             text-align: center;
             font-size: 48px;
             color: #b91c1c;
             margin-bottom: 10px;
         }
-
         h1 {
             text-align: center;
             margin-bottom: 5px;
             color: #b91c1c;
         }
-
         h2 {
             text-align: center;
             font-weight: normal;
@@ -56,25 +52,21 @@
             color: #444;
             margin-bottom: 30px;
         }
-
         form {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
-
         .form-group {
             flex: 1 1 45%;
             display: flex;
             flex-direction: column;
         }
-
         label {
             margin-bottom: 6px;
             font-size: 14px;
             color: #000;
         }
-
         input {
             padding: 10px;
             font-size: 14px;
@@ -83,11 +75,9 @@
             background-color: #fff;
             color: #333;
         }
-
         .form-group.full-width {
             flex: 1 1 100%;
         }
-
         button {
             margin-top: 20px;
             width: 100%;
@@ -101,12 +91,10 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s;
         }
-
         button:hover {
             background-color: #991b1b;
             transform: scale(1.03);
         }
-
         .error {
             color: red;
             text-align: center;
@@ -162,88 +150,11 @@
             <button type="submit" name="submit">Register as Admin</button>
         </div>
     </form>
-
-
 <?php
-session_start();
-
 function encrypt_data($data, $key) {
     $iv = openssl_random_pseudo_bytes(16);
     $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
     return base64_encode($iv . $encrypted);
-}
-
-function generateOTP($length = 6) {
-    $digits = '0123456789';
-    $otp = '';
-    for ($i = 0; $i < $length; $i++) {
-        $otp .= $digits[random_int(0, strlen($digits) - 1)];
-    }
-    return $otp;
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $first_name = $_POST['first_name'];
-    $middle_name = $_POST['middle_name'];
-    $last_name = $_POST['last_name'];
-    $birthday = $_POST['birthday'];
-    $contact_number = $_POST['contact_number'];
-    $employee_number = $_POST['employee_number'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    if ($password !== $confirm_password) {
-        echo "<div class='error'>Passwords do not match.</div>";
-        exit;
-    }
-
-    $encryption_key = "your-strong-secret-key";
-    $encrypted_email = encrypt_data($email, $encryption_key);
-    $encrypted_contact = encrypt_data($contact_number, $encryption_key);
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-    $conn = new mysqli("localhost", "root", "", "aide_binan");
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $stmt = $conn->prepare("INSERT INTO admin_users (first_name, middle_name, last_name, birthday, contact_number, employee_number, email, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss",
-        $first_name, $middle_name, $last_name, $birthday,
-        $encrypted_contact, $employee_number, $encrypted_email, $password_hash
-    );
-
-    if ($stmt->execute()) {
-        $otp = generateOTP();
-        $_SESSION['admin_otp'] = $otp;
-        $_SESSION['admin_contact'] = $contact_number;
-
-        echo "<script>
-            alert('Admin registration successful! OTP for testing: $otp');
-            window.location.href = 'verify_otp_admin.php';
-        </script>";
-    } else {
-        echo "<div class='error'>Error: " . $stmt->error . "</div>";
-    }
-
-    $stmt->close();
-    $conn->close();
-}
-?>
-</div>
-</body>
-</html>
-
-
-<?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-function encrypt_data($data, $key) {
-    $iv = random_bytes(16);
-    $ciphertext = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
-    return base64_encode($iv . $ciphertext);
 }
 
 function decrypt_data($encrypted_data, $key) {
@@ -269,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_password = $_POST['confirm_password'];
 
     if ($password !== $confirm_password) {
-        echo "<p style='color:red;'>Passwords do not match.</p>";
+        echo "<div class='error'>Passwords do not match.</div>";
         exit;
     }
 
@@ -285,12 +196,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $check = $conn->query("SELECT email, contact_number FROM admin_users");
     while ($row = $check->fetch_assoc()) {
-        if ($email === decrypt_data($row['email'], $encryption_key)) {
-            echo "<p style='color:red;'>Email already registered.</p>";
+        $decrypted_email = decrypt_data($row['email'], $encryption_key);
+        $decrypted_contact = decrypt_data($row['contact_number'], $encryption_key);
+
+        if ($email === $decrypted_email) {
+            echo "<div class='error'>Email already registered.</div>";
             $conn->close(); exit;
         }
-        if ($contact_number === decrypt_data($row['contact_number'], $encryption_key)) {
-            echo "<p style='color:red;'>Contact number already registered.</p>";
+        if ($contact_number === $decrypted_contact) {
+            echo "<div class='error'>Contact number already registered.</div>";
             $conn->close(); exit;
         }
     }
@@ -303,13 +217,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['admin_otp'] = $otp;
         $_SESSION['admin_email'] = $email;
 
-        echo "<script>alert('OTP for testing: $otp'); window.location.href='verify_otp_admin.php';</script>";
+        echo "<script>
+            alert('Admin registration successful! OTP for testing: $otp');
+            window.location.href = 'verify_otp_admin.php';
+        </script>";
     } else {
-        echo "<p style='color:red;'>Error: " . $stmt->error . "</p>";
+        echo "<div class='error'>Error: " . $stmt->error . "</div>";
     }
 
-    $stmt->close(); $conn->close();
+    $stmt->close();
+    $conn->close();
 }
 ?>
+</div>
 </body>
 </html>
