@@ -16,6 +16,8 @@ function decrypt_data($encrypted_data, $key) {
 
 $encryption_key = "your-strong-secret-key";
 
+$error = "";
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input_email = $_POST['email'];
     $input_password = $_POST['password'];
@@ -35,24 +37,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo "<script>alert('OTP for testing: {$_SESSION['admin_otp']}'); window.location.href='login_otp_admin.php';</script>";
                 exit();
             } else {
-                echo "<p style='color:red;'>Incorrect password.</p>";
+                $error = "Incorrect password.";
                 break;
             }
         }
     }
-    if (!$found) echo "<p style='color:red;'>Email not found.</p>";
+    if (!$found) $error = "Email not found.";
     $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
-<html>
-<head><title>Admin Login</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin Login - AIDE Biñan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #fde0e0, #ffe8e8);
+            font-family: Arial, sans-serif;
+        }
+        .blur-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            z-index: 0;
+        }
+        .circle1 {
+            width: 400px;
+            height: 400px;
+            background: #f87171;
+            top: -100px;
+            left: -100px;
+        }
+        .circle2 {
+            width: 300px;
+            height: 300px;
+            background: #facc15;
+            bottom: -80px;
+            right: -80px;
+        }
+    </style>
+</head>
 <body>
-<h1>Login as Admin</h1>
-<form action="" method="POST">
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
-    <button type="submit">Login</button>
-</form>
+    <div class="blur-circle circle1"></div>
+    <div class="blur-circle circle2"></div>
+
+    <header class="bg-red-900 text-white px-6 py-4 flex justify-between items-center relative z-10">
+        <h1 class="text-xl font-bold">A.I.D.E. BIÑAN</h1>
+        <nav class="space-x-6">
+            <a href="#" class="hover:underline">Home</a>
+            <a href="#" class="hover:underline">About</a>
+        </nav>
+    </header>
+
+    <section class="flex flex-col items-center justify-center min-h-screen relative z-10">
+        <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md backdrop-blur-md bg-opacity-90">
+            <h2 class="text-2xl font-bold text-center mb-2 text-gray-800">Admin Login</h2>
+            <form action="" method="POST" class="space-y-4">
+                <input type="email" name="email" placeholder="Email" required class="w-full border px-4 py-2 rounded focus:outline-none">
+                <input type="password" name="password" placeholder="Password" required class="w-full border px-4 py-2 rounded focus:outline-none">
+                <button type="submit" class="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Login</button>
+            </form>
+
+            <?php if (!empty($error)): ?>
+                <div class="bg-red-100 text-red-700 border border-red-300 p-2 rounded mt-4 text-center">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
 </body>
 </html>

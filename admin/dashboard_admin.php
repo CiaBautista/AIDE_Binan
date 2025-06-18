@@ -3,76 +3,111 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-if (!isset($_SESSION['admin_email'])) {
-    header("Location: login_admin.php");
-    exit();
+function generateOTP($length = 6) {
+    return str_pad(random_int(0, pow(10, $length)-1), $length, '0', STR_PAD_LEFT);
 }
 
 function decrypt_data($encrypted_data, $key) {
-    if (!$encrypted_data) return false;
     $data = base64_decode($encrypted_data);
-    if ($data === false || strlen($data) < 17) return false;
     $iv = substr($data, 0, 16);
     $ciphertext = substr($data, 16);
     return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
 }
 
 $encryption_key = "your-strong-secret-key";
-$email = $_SESSION['admin_email'];
 
-$conn = new mysqli("localhost", "root", "", "aide_binan");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$error = "";
 
-$query = "SELECT * FROM admin_users";
-$result = $conn->query($query);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input_email = $_POST['email'];
+    $input_password = $_POST['password'];
 
-$admin = null;
-while ($row = $result->fetch_assoc()) {
-    $decrypted_email = decrypt_data($row['email'], $encryption_key);
-    if ($decrypted_email === $email) {
-        $row['email'] = $email;
-        $row['contact_number'] = decrypt_data($row['contact_number'], $encryption_key);
-        $admin = $row;
-        break;
+    $conn = new mysqli("localhost", "root", "", "aide_binan");
+    if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
+
+    $query = "SELECT email, password_hash FROM admin_users";
+    $result = $conn->query($query);
+    $found = false;
+    while ($row = $result->fetch_assoc()) {
+        if ($input_email === decrypt_data($row['email'], $encryption_key)) {
+            $found = true;
+            if (password_verify($input_password, $row['password_hash'])) {
+                $_SESSION['admin_otp'] = generateOTP();
+                $_SESSION['admin_email'] = $input_email;
+                echo "<script>alert('OTP for testing: {$_SESSION['admin_otp']}'); window.location.href='login_otp_admin.php';</script>";
+                exit();
+            } else {
+                $error = "Incorrect password.";
+                break;
+            }
+        }
     }
+    if (!$found) $error = "Email not found.";
+    $conn->close();
 }
-
-if (!$admin) {
-    echo "<p>User not found. Debug: Session Email = $email</p>";
-    exit();
-}
-
-$conn->close();
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Dashboard</title>
+    <meta charset="UTF-8" />
+    <title>Admin Login - AIDE Biñan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #fde0e0, #ffe8e8);
+            font-family: Arial, sans-serif;
+        }
+        .blur-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            z-index: 0;
+        }
+        .circle1 {
+            width: 400px;
+            height: 400px;
+            background: #f87171;
+            top: -100px;
+            left: -100px;
+        }
+        .circle2 {
+            width: 300px;
+            height: 300px;
+            background: #facc15;
+            bottom: -80px;
+            right: -80px;
+        }
+    </style>
 </head>
 <body>
-<h1>Welcome, <?= htmlspecialchars($admin['first_name']) ?>!</h1>
+    <div class="blur-circle circle1"></div>
+    <div class="blur-circle circle2"></div>
 
-<h2>Account Details</h2>
-<ul>
-    <li><strong>First Name:</strong> <?= htmlspecialchars($admin['first_name']) ?></li>
-    <li><strong>Middle Name:</strong> <?= htmlspecialchars($admin['middle_name']) ?></li>
-    <li><strong>Last Name:</strong> <?= htmlspecialchars($admin['last_name']) ?></li>
-    <li><strong>Birthday:</strong> <?= htmlspecialchars($admin['birthday']) ?></li>
-    <li><strong>Contact Number:</strong> <?= htmlspecialchars($admin['contact_number']) ?></li>
-    <li><strong>Email:</strong> <?= htmlspecialchars($admin['email']) ?></li>
-    <li><strong>Employee Number:</strong> <?= htmlspecialchars($admin['employee_number']) ?></li>
-</ul>
+    <header class="bg-red-900 text-white px-6 py-4 flex justify-between items-center relative z-10">
+        <h1 class="text-xl font-bold">A.I.D.E. BIÑAN</h1>
+        <nav class="space-x-6">
+            <a href="#" class="hover:underline">Home</a>
+            <a href="#" class="hover:underline">About</a>
+        </nav>
+    </header>
 
-<h2>Menu</h2>
-<ul>
-    <li><a href="#">Violation</a></li>
-    <li><a href="#">Penalty</a></li>
-    <li><a href="#">E-Bike Laws</a></li>
-    <li><a href="#">Notifications</a></li>
-    <li><a href="#">About</a></li>
-    <li><a href="logout_admin.php">Logout</a></li>
-</ul>
+    <section class="flex flex-col items-center justify-center min-h-screen relative z-10">
+        <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md backdrop-blur-md bg-opacity-90">
+            <h2 class="text-2xl font-bold text-center mb-2 text-gray-800">Admin Login</h2>
+            <form action="" method="POST" class="space-y-4">
+                <input type="email" name="email" placeholder="Email" required class="w-full border px-4 py-2 rounded focus:outline-none">
+                <input type="password" name="password" placeholder="Password" required class="w-full border px-4 py-2 rounded focus:outline-none">
+                <button type="submit" class="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Login</button>
+            </form>
+
+            <?php if (!empty($error)): ?>
+                <div class="bg-red-100 text-red-700 border border-red-300 p-2 rounded mt-4 text-center">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
 </body>
 </html>
