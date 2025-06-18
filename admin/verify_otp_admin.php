@@ -1,0 +1,27 @@
+<?php
+session_start();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $enteredOtp = $_POST['otp'] ?? '';
+    $correctOtp = $_SESSION['admin_otp'] ?? '';
+
+    if ($enteredOtp === $correctOtp) {
+        unset($_SESSION['admin_otp']);
+        header("Location: dashboard_admin.php");
+        exit();
+    } else {
+        echo "<p style='color:red;'>Invalid OTP.</p>";
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head><title>Verify OTP</title></head>
+<body>
+<h1>Verify OTP</h1>
+<form method="POST">
+    <input type="text" name="otp" placeholder="Enter OTP" required>
+    <button type="submit">Verify</button>
+</form>
+</body>
+</html>
+
