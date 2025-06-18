@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\rider",
+    "\\system"
   ],
-  "SelectedNode": "\\C:\\Users\\Helaena P. Redondo\\Source\\Repos\\AIDE_Binan",
+  "SelectedNode": "\\rider\\register_rider.php",
   "PreviewInSolutionExplorer": false
 }
