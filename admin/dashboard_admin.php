@@ -56,11 +56,13 @@ $conn->close();
         * {
             box-sizing: border-box;
         }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #fef2f2;
         }
+
         header {
             background: #7f1d1d;
             color: white;
@@ -69,25 +71,35 @@ $conn->close();
             justify-content: space-between;
             align-items: center;
         }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
         .logo {
             font-weight: bold;
             font-size: 22px;
-            letter-spacing: 1px;
         }
+
         .logout-btn {
             background: #b91c1c;
             color: white;
             border: none;
             padding: 10px 16px;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 6px;
         }
+
         .logout-btn:hover {
             background: #991b1b;
         }
+
         .container {
             display: flex;
         }
+
         .sidebar {
             width: 220px;
             background: #991b1b;
@@ -95,33 +107,88 @@ $conn->close();
             padding: 20px 0;
             color: white;
         }
+
         .sidebar ul {
             list-style: none;
             padding-left: 0;
         }
+
         .sidebar ul li {
-            padding: 12px 20px;
+            padding: 14px 20px;
+            font-weight: 500;
             cursor: pointer;
         }
+
         .sidebar ul li:hover {
             background: #ef4444;
+            transition: 0.3s;
         }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+
         .main {
             flex: 1;
-            padding: 20px;
+            padding: 30px;
         }
+
         .info-box {
             background: white;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
+
         .info-box h2 {
             margin-top: 0;
+            color: #7f1d1d;
+            font-size: 22px;
         }
+
         .info-box p {
-            margin: 8px 0;
+            margin: 6px 0;
+            font-size: 16px;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .summary-box {
+            flex: 1;
+            min-width: 240px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-box h3 {
+            margin: 0;
+            color: #b91c1c;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .summary-box p {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #111;
         }
     </style>
 </head>
@@ -136,12 +203,12 @@ $conn->close();
 <div class="container">
     <div class="sidebar">
         <ul>
-            <li>Dashboard</li>
-            <li><a href="../ai/violation.php" style="color: white; text-decoration: none;">Violation</a></li>
-            <li>Penalty</li>
-            <li>E-Bike Laws</li>
-            <li>Notifications</li>
-            <li>About</li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="../ai/violation.php">Violation</a></li>
+            <li><a href="#">Penalty</a></li>
+            <li><a href="#">E-Bike Laws</a></li>
+            <li><a href="#">Notifications</a></li>
+            <li><a href="#">About</a></li>
         </ul>
     </div>
 
@@ -156,8 +223,39 @@ $conn->close();
             <p><strong>Email:</strong> <?= htmlspecialchars($admin['email']) ?></p>
             <p><strong>Employee Number:</strong> <?= htmlspecialchars($admin['employee_number']) ?></p>
         </div>
+
+        <div class="summary">
+            <div class="summary-box">
+                <h3>E-bike Laws</h3>
+                <p>View list of Laws</p>
+            </div>
+            <div class="summary-box">
+                <h3>Registered Riders</h3>
+                <p>1,560</p>
+            </div>
+            <div class="summary-box">
+                <h3>Total Penalties</h3>
+                <p>List of penalties</p>
+            </div>
+        </div>
+
+        <br><br><br>
+
+        <div class="summary">
+            <div class="summary-box">
+                <h3>About</h3>
+                <p>System Info</p>
+            </div>
+            <div class="summary-box">
+                <h3>Payment Details</h3>
+                <p>Payments List</p>
+            </div>
+            <div class="summary-box">
+                <h3>Alert</h3>
+                <p>Notifications</p>
+            </div>
+        </div>
     </div>
 </div>
-
 </body>
 </html>

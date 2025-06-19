@@ -1,127 +1,242 @@
 ﻿<?php
 session_start();
-require_once '../db.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-if (!isset($_SESSION['admin_email'])) {
-    header("Location: login_admin.php");
+if (!isset($_SESSION['rider_email'])) {
+    header("Location: login_rider.php");
     exit();
 }
 
-function formatViolation($row) {
-    $violations = [];
-    if ($row['no_helmet']) $violations[] = 'No Helmet';
-    if ($row['no_side_mirror']) $violations[] = 'No Side Mirror';
-    if ($row['fake_plate']) $violations[] = 'Fake/Tampered Plate';
-    if ($row['unregistered']) $violations[] = 'Unregistered';
-    if ($row['expired_registration']) $violations[] = 'Expired Registration';
-    return implode(', ', $violations);
+function decrypt_data($encrypted_data, $key) {
+    $data = base64_decode($encrypted_data);
+    $iv = substr($data, 0, 16);
+    $ciphertext = substr($data, 16);
+    return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
 }
 
-$result = $conn->query("SELECT * FROM violations ORDER BY detected_at DESC");
-$violations = [];
+$encryption_key = "your-strong-secret-key";
+$email = $_SESSION['rider_email'];
 
+$conn = new mysqli("localhost", "root", "", "aide_binan");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$query = "SELECT * FROM rider_users";
+$result = $conn->query($query);
+
+$rider = null;
 while ($row = $result->fetch_assoc()) {
-    $stmt = $conn->prepare("SELECT first_name, middle_name, last_name, ebike_type, ebike_model, ebike_color, ebike_control_number, ebike_plate FROM rider_users WHERE ebike_plate = ?");
-    $stmt->bind_param('s', $row['ebike_plate']);
-    $stmt->execute();
-    $riderResult = $stmt->get_result();
-    $rider = $riderResult->fetch_assoc();
-
-    $row['rider'] = $rider ?: null;
-    $violations[] = $row;
+    if (decrypt_data($row['email'], $encryption_key) === $email) {
+        $row['email'] = $email;
+        $row['contact_number'] = decrypt_data($row['contact_number'], $encryption_key);
+        $rider = $row;
+        break;
+    }
 }
-?>
 
+if (!$rider) {
+    echo "<p>User not found.</p>";
+    exit();
+}
+
+$conn->close();
+?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Violation Records - Admin View</title>
+    <meta charset="UTF-8">
+    <title>Rider Dashboard</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
             background: #fef2f2;
-            padding: 20px;
         }
-        h2 {
-            color: #7f1d1d;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        th {
-            background-color: #991b1b;
+
+        header {
+            background: #7f1d1d;
             color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        tr.unregistered {
-            background-color: #f3f4f6;
-            color: #6b7280;
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: bold;
         }
-        img {
-            max-width: 100px;
-            height: auto;
+
+        .logo {
+            font-weight: bold;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        .logout-btn {
+            background: #b91c1c;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .logout-btn:hover {
+            background: #991b1b;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #991b1b;
+            min-height: 100vh;
+            color: white;
+            padding-top: 30px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .sidebar ul li {
+            padding: 14px 20px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .sidebar ul li:hover {
+            background: #ef4444;
+            transition: 0.3s;
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .info-box {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-box h2 {
+            margin-top: 0;
+            color: #7f1d1d;
+            font-size: 22px;
+        }
+
+        .info-box ul {
+            padding: 0;
+            list-style: none;
+            line-height: 1.7;
+        }
+
+        .info-box li {
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .summary-box {
+            flex: 1;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .summary-box h3 {
+            margin: 0;
+            color: #991b1b;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .summary-box p {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #111;
         }
     </style>
 </head>
 <body>
-    <h2>Violation Records – Admin View</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Photo</th>
-                <th>Rider Name</th>
-                <th>E-bike Type</th>
-                <th>Model</th>
-                <th>Color</th>
-                <th>Control #</th>
-                <th>Plate #</th>
-                <th>Violation</th>
-                <th>Date/Time</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($violations as $v): ?>
-                <tr class="<?= $v['unregistered'] ? 'unregistered' : '' ?>">
-                    <td>
-                        <?php if (!empty($v['image_path'])): ?>
-                            <img src="<?= htmlspecialchars($v['image_path']) ?>" alt="E-bike">
-                        <?php else: ?>
-                            <em>No image</em>
-                        <?php endif; ?>
-                    </td>
-                    <?php if ($v['rider']): ?>
-                        <td><?= htmlspecialchars($v['rider']['first_name'] . ' ' . $v['rider']['middle_name'] . ' ' . $v['rider']['last_name']) ?></td>
-                        <td><?= htmlspecialchars($v['rider']['ebike_type']) ?></td>
-                        <td><?= htmlspecialchars($v['rider']['ebike_model']) ?></td>
-                        <td><?= htmlspecialchars($v['rider']['ebike_color']) ?></td>
-                        <td><?= htmlspecialchars($v['rider']['ebike_control_number']) ?></td>
-                        <td><?= htmlspecialchars($v['rider']['ebike_plate']) ?></td>
-                    <?php else: ?>
-                        <td><em>Unknown</em></td>
-                        <td><?= htmlspecialchars($v['ebike_type']) ?></td>
-                        <td><?= htmlspecialchars($v['ebike_model']) ?></td>
-                        <td><?= htmlspecialchars($v['ebike_color']) ?></td>
-                        <td><em>Unknown</em></td>
-                        <td><?= htmlspecialchars($v['ebike_plate']) ?></td>
-                    <?php endif; ?>
+<header>
+    <div class="logo">🚴 AIDE BIÑAN</div>
+    <h1>Rider Dashboard</h1>
+    <a href="logout_rider.php"><button class="logout-btn">Logout</button></a>
+</header>
 
-                    <td><?= formatViolation($v) ?></td>
-                    <td><?= htmlspecialchars($v['detected_at']) ?></td>
-                    <td><?= htmlspecialchars($v['payment_status'] ?? 'Not Paid') ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+<div class="container">
+    <div class="sidebar">
+        <ul>
+            <li>E-Bike Laws</li>
+            <li>Penalty</li>
+            <li>Notifications</li>
+            <li>About</li>
+        </ul>
+    </div>
 
-    <br><a href="dashboard_admin.php">⬅ Back to Dashboard</a>
+    <div class="main">
+        <div class="info-box">
+            <h2>Welcome, <?= htmlspecialchars($rider['first_name']) ?>!</h2>
+            <ul>
+                <li><strong>First Name:</strong> <?= htmlspecialchars($rider['first_name']) ?></li>
+                <li><strong>Middle Name:</strong> <?= htmlspecialchars($rider['middle_name']) ?></li>
+                <li><strong>Last Name:</strong> <?= htmlspecialchars($rider['last_name']) ?></li>
+                <li><strong>Birthday:</strong> <?= htmlspecialchars($rider['birthday']) ?></li>
+                <li><strong>Contact Number:</strong> <?= htmlspecialchars($rider['contact_number']) ?></li>
+                <li><strong>Email:</strong> <?= htmlspecialchars($rider['email']) ?></li>
+                <li><strong>E-bike Type:</strong> <?= htmlspecialchars($rider['ebike_type']) ?></li>
+                <li><strong>E-bike Model:</strong> <?= htmlspecialchars($rider['ebike_model']) ?></li>
+                <li><strong>E-bike Color:</strong> <?= htmlspecialchars($rider['ebike_color']) ?></li>
+                <li><strong>Plate Number:</strong> <?= htmlspecialchars($rider['ebike_plate']) ?: 'Not Assigned Yet' ?></li>
+                <li><strong>Purchase Date:</strong> <?= htmlspecialchars($rider['ebike_purchased']) ?></li>
+                <li><strong>Control Number:</strong> <?= htmlspecialchars($rider['ebike_control_number']) ?></li>
+            </ul>
+        </div>
+
+        <div class="summary">
+            <div class="summary-box">
+                <h3>About</h3>
+                <p>System Info</p>
+            </div>
+            <div class="summary-box">
+                <h3>Info</h3>
+                <p>System Details</p>
+            </div>
+            <div class="summary-box">
+                <h3>Alert</h3>
+                <p>Notifications</p>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
