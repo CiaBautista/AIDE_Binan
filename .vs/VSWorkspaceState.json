@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\admin",
+    "\\ai",
+    "\\rider",
+    "\\system"
   ],
-  "SelectedNode": "\\C:\\Users\\Jethro L. Sarmiento\\Source\\Repos\\AIDE_Binan",
+  "SelectedNode": "\\system\\register.php",
   "PreviewInSolutionExplorer": false
 }

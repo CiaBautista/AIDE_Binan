@@ -60,10 +60,10 @@
     <div class="card">
         <h1>Select Registration Type</h1>
 
-    <form method="POST">
-        <button type="submit" name="role" value="rider">Rider</button>
-        <button type="submit" name="role" value="admin">Admin</button>
-    </form>
+        <form method="POST">
+            <button type="submit" name="role" value="rider">Rider</button>
+            <button type="submit" name="role" value="admin">Admin</button>
+        </form>
     </div>
 
     <?php
@@ -77,5 +77,6 @@
         exit();
     }
     ?>
+
 </body>
 </html>

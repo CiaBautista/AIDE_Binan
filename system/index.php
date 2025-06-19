@@ -114,9 +114,7 @@
 </head>
 
 <body>
-    <a href="ai.php">
-        <button class="dot-button"></button>
-    </a>
+    <button class="dot-button" onclick="window.location.href='../ai/ai.php'"></button>
 
     <div class="container">
         <h1>Welcome to A.I.D.E. BIÑAN</h1>
