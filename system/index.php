@@ -11,7 +11,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-          
             background: radial-gradient(circle at center, #b91c1c, #dc2626, #f87171, #ffcccc);
             background-size: 300% 300%;
             animation: moveBG 15s ease infinite;
@@ -73,6 +72,24 @@
             transform: scale(1.08);
             box-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 25px rgba(255, 0, 0, 0.5);
         }
+
+        .register-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 15px;
+            color: #000;
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
+
+        .register-link b {
+            color: #000;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -80,15 +97,17 @@
     <div class="container">
         <h1>Welcome to A.I.D.E. BIÑAN</h1>
 
-<form action="" method="POST">
-    <button type="submit" name="action" value="login_rider">Rider</button>
-    <button type="submit" name="action" value="login_admin">Admin</button>
-    <button type="submit" name="action" value="register">Register</button>
-</form>
+        <form action="" method="POST">
+            <button type="submit" name="action" value="login_rider">Rider</button>
+            <button type="submit" name="action" value="login_admin">Admin</button>
+        </form>
+
+        <a href="register.php" class="register-link">
+            <span>Don’t have an account? </span><b>Register</b>
+        </a>
     </div>
 
 <?php
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     switch ($_POST['action']) {
         case "register": header("Location: register.php"); break;
