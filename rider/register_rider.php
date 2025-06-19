@@ -313,7 +313,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         echo "<script>
             alert('Registration successful! OTP: $otp');
-            window.location.href = 'login_rider.php';
+            window.location.href = 'login_otp_rider.php';
         </script>";
     } else {
         echo "<script>alert('Error: " . $stmt->error . "');</script>";

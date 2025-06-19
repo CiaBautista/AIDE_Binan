@@ -137,7 +137,7 @@ $conn->close();
     <div class="sidebar">
         <ul>
             <li>Dashboard</li>
-            <li>Violation</li>
+            <li><a href="../ai/violation.php" style="color: white; text-decoration: none;">Violation</a></li>
             <li>Penalty</li>
             <li>E-Bike Laws</li>
             <li>Notifications</li>
