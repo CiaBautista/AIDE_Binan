@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
     <title>Register</title>
     <style>
         body {
@@ -14,12 +14,32 @@
             background: radial-gradient(circle at center, #b91c1c, #dc2626, #f87171, #ffcccc);
             background-size: 300% 300%;
             animation: moveBG 15s ease infinite;
+            position: relative;
         }
 
         @keyframes moveBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        .dot-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 16px;
+            height: 16px;
+            background-color: #991b1b;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .dot-button:hover {
+            background-color: #770f0f;
+            transform: scale(1.2);
         }
 
         .container {
@@ -94,6 +114,10 @@
 </head>
 
 <body>
+    <a href="ai.php">
+        <button class="dot-button"></button>
+    </a>
+
     <div class="container">
         <h1>Welcome to A.I.D.E. BIÑAN</h1>
 
