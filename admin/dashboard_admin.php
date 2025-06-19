@@ -1,113 +1,163 @@
-<?php
+﻿<?php
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-function generateOTP($length = 6) {
-    return str_pad(random_int(0, pow(10, $length)-1), $length, '0', STR_PAD_LEFT);
+if (!isset($_SESSION['admin_email'])) {
+    header("Location: login_admin.php");
+    exit();
 }
 
 function decrypt_data($encrypted_data, $key) {
+    if (!$encrypted_data) return false;
     $data = base64_decode($encrypted_data);
+    if ($data === false || strlen($data) < 17) return false;
     $iv = substr($data, 0, 16);
     $ciphertext = substr($data, 16);
     return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
 }
 
 $encryption_key = "your-strong-secret-key";
+$email = $_SESSION['admin_email'];
 
-$error = "";
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $input_email = $_POST['email'];
-    $input_password = $_POST['password'];
-
-    $conn = new mysqli("localhost", "root", "", "aide_binan");
-    if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
-
-    $query = "SELECT email, password_hash FROM admin_users";
-    $result = $conn->query($query);
-    $found = false;
-    while ($row = $result->fetch_assoc()) {
-        if ($input_email === decrypt_data($row['email'], $encryption_key)) {
-            $found = true;
-            if (password_verify($input_password, $row['password_hash'])) {
-                $_SESSION['admin_otp'] = generateOTP();
-                $_SESSION['admin_email'] = $input_email;
-                echo "<script>alert('OTP for testing: {$_SESSION['admin_otp']}'); window.location.href='login_otp_admin.php';</script>";
-                exit();
-            } else {
-                $error = "Incorrect password.";
-                break;
-            }
-        }
-    }
-    if (!$found) $error = "Email not found.";
-    $conn->close();
+$conn = new mysqli("localhost", "root", "", "aide_binan");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+$query = "SELECT * FROM admin_users";
+$result = $conn->query($query);
+
+$admin = null;
+while ($row = $result->fetch_assoc()) {
+    $decrypted_email = decrypt_data($row['email'], $encryption_key);
+    if ($decrypted_email === $email) {
+        $row['email'] = $email;
+        $row['contact_number'] = decrypt_data($row['contact_number'], $encryption_key);
+        $admin = $row;
+        break;
+    }
+}
+
+if (!$admin) {
+    echo "<p>User not found. Debug: Session Email = $email</p>";
+    exit();
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Admin Login - AIDE Bi�an</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - AIDE Biñan</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            background: linear-gradient(135deg, #fde0e0, #ffe8e8);
+            margin: 0;
             font-family: Arial, sans-serif;
+            background: #fef2f2;
         }
-        .blur-circle {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.5;
-            z-index: 0;
+        header {
+            background: #7f1d1d;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .circle1 {
-            width: 400px;
-            height: 400px;
-            background: #f87171;
-            top: -100px;
-            left: -100px;
+        .logo {
+            font-weight: bold;
+            font-size: 22px;
+            letter-spacing: 1px;
         }
-        .circle2 {
-            width: 300px;
-            height: 300px;
-            background: #facc15;
-            bottom: -80px;
-            right: -80px;
+        .logout-btn {
+            background: #b91c1c;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .logout-btn:hover {
+            background: #991b1b;
+        }
+        .container {
+            display: flex;
+        }
+        .sidebar {
+            width: 220px;
+            background: #991b1b;
+            min-height: 100vh;
+            padding: 20px 0;
+            color: white;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .sidebar ul li {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background: #ef4444;
+        }
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+        .info-box {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .info-box h2 {
+            margin-top: 0;
+        }
+        .info-box p {
+            margin: 8px 0;
         }
     </style>
 </head>
 <body>
-    <div class="blur-circle circle1"></div>
-    <div class="blur-circle circle2"></div>
 
-    <header class="bg-red-900 text-white px-6 py-4 flex justify-between items-center relative z-10">
-        <h1 class="text-xl font-bold">A.I.D.E. BI�AN</h1>
-        <nav class="space-x-6">
-            <a href="#" class="hover:underline">Home</a>
-            <a href="#" class="hover:underline">About</a>
-        </nav>
-    </header>
+<header>
+    <div class="logo">🛵 AIDE BIÑAN</div>
+    <h1>Admin Dashboard</h1>
+    <a href="logout_admin.php"><button class="logout-btn">Logout</button></a>
+</header>
 
-    <section class="flex flex-col items-center justify-center min-h-screen relative z-10">
-        <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md backdrop-blur-md bg-opacity-90">
-            <h2 class="text-2xl font-bold text-center mb-2 text-gray-800">Admin Login</h2>
-            <form action="" method="POST" class="space-y-4">
-                <input type="email" name="email" placeholder="Email" required class="w-full border px-4 py-2 rounded focus:outline-none">
-                <input type="password" name="password" placeholder="Password" required class="w-full border px-4 py-2 rounded focus:outline-none">
-                <button type="submit" class="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800">Login</button>
-            </form>
+<div class="container">
+    <div class="sidebar">
+        <ul>
+            <li>Dashboard</li>
+            <li>Violation</li>
+            <li>Penalty</li>
+            <li>E-Bike Laws</li>
+            <li>Notifications</li>
+            <li>About</li>
+        </ul>
+    </div>
 
-            <?php if (!empty($error)): ?>
-                <div class="bg-red-100 text-red-700 border border-red-300 p-2 rounded mt-4 text-center">
-                    <?= htmlspecialchars($error) ?>
-                </div>
-            <?php endif; ?>
+    <div class="main">
+        <div class="info-box">
+            <h2>Welcome, <?= htmlspecialchars($admin['first_name']) ?>!</h2>
+            <p><strong>First Name:</strong> <?= htmlspecialchars($admin['first_name']) ?></p>
+            <p><strong>Middle Name:</strong> <?= htmlspecialchars($admin['middle_name']) ?></p>
+            <p><strong>Last Name:</strong> <?= htmlspecialchars($admin['last_name']) ?></p>
+            <p><strong>Birthday:</strong> <?= htmlspecialchars($admin['birthday']) ?></p>
+            <p><strong>Contact Number:</strong> <?= htmlspecialchars($admin['contact_number']) ?></p>
+            <p><strong>Email:</strong> <?= htmlspecialchars($admin['email']) ?></p>
+            <p><strong>Employee Number:</strong> <?= htmlspecialchars($admin['employee_number']) ?></p>
         </div>
-    </section>
+    </div>
+</div>
+
 </body>
 </html>
