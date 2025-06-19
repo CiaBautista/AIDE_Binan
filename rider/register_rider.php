@@ -146,17 +146,18 @@
            
             <div class="col-span-2 mt-4">
                 <button type="submit" name="submit" class="w-full bg-red-700 text-white font-semibold py-3 rounded-lg hover:bg-red-800 transition duration-300">
-                    🚴‍♂️ Register as Rider
+                    🚴‍♂️ Register
                 </button>
             </div>
 
             <div class="col-span-2 text-center mt-4 text-sm text-white">
                 Already have an account? 
-                <a href="#" class="text-red-200 hover:underline">Login</a>
+                <a href="login_rider.php" class="text-red-200 hover:underline">Login</a>
             </div>
         </form>
     </div>
 </main>
+
 <?php
 function encrypt_data($data, $key) {
     $iv = openssl_random_pseudo_bytes(16);
