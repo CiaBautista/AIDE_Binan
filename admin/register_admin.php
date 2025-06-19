@@ -144,31 +144,48 @@
         </div>
         <div class="form-group full-width">
             <label>Employee Number:</label>
-            <input type="text" name="employee_number" required>
+        <input type="text" name="employee_number" pattern="[0-9]+" inputmode="numeric" title="Please enter numbers only" required>
         </div>
         <div class="form-group full-width">
             <button type="submit" name="submit">Register as Admin</button>
         </div>
     </form>
 
+
 <?php
+mysqli_report(MYSQLI_REPORT_OFF); // Disable exception throwing
 
 function encrypt_data($data, $key) {
-    $iv = openssl_random_pseudo_bytes(16);
+    $iv = openssl_random_pseudo_bytes(16); // Generate a 16-byte IV
     $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
+
+    if ($encrypted === false) {
+        return false; // encryption failed
+    }
+
+    // Combine IV + encrypted data and encode for storage
     return base64_encode($iv . $encrypted);
 }
 
 function decrypt_data($encrypted_data, $key) {
     $data = base64_decode($encrypted_data);
-    $iv = substr($data, 0, 16);
-    $ciphertext = substr($data, 16);
-    return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
+
+    // Ensure data is long enough for IV + ciphertext
+    if ($data === false || strlen($data) < 17) { // Minimum 17 = 16 IV + 1 byte ciphertext
+        return false; // corrupted or invalid
+    }
+
+    $iv = substr($data, 0, 16); // First 16 bytes = IV
+    $ciphertext = substr($data, 16); // Rest = actual encrypted data
+
+    $decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
+    return $decrypted !== false ? $decrypted : false;
 }
 
 function generateOTP($length = 6) {
     return str_pad(random_int(0, pow(10, $length) - 1), $length, '0', STR_PAD_LEFT);
 }
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $first_name = ucwords(strtolower(trim($_POST['first_name'])));
@@ -181,12 +198,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    if ($password !== $confirm_password) {
-        echo "<div class='error'>Passwords do not match.</div>";
-        exit;
+    if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($birthday)) {
+        echo "<div class='error'>Please fill in all required fields.</div>";
+        return;
     }
 
-   
+    if (strlen($password) < 8 || 
+        !preg_match('/[A-Z]/', $password) || 
+        !preg_match('/\d/', $password) || 
+        !preg_match('/[!@#$%^&*(),.?\":{}|<>]/', $password)) {
+        echo "<div class='error'>Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.</div>";
+        return;
+    }
+
+    if ($password !== $confirm_password) {
+        echo "<div class='error'>Passwords do not match.</div>";
+        return;
+    }
+
+    if (!preg_match('/^09[0-9]{9}$/', $contact_number)) {
+        echo "<div class='error'>Contact number must start with 09 and be exactly 11 digits.</div>";
+        return;
+    }
+
     $encryption_key = "your-strong-secret-key";
     $encrypted_email = encrypt_data($email, $encryption_key);
     $encrypted_contact = encrypt_data($contact_number, $encryption_key);
@@ -194,8 +228,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $conn = new mysqli("localhost", "root", "", "aide_binan");
     if ($conn->connect_error) {
-        die("Database connection failed.");
+        die("<div class='error'>Database connection failed.</div>");
     }
+
+    // ✅ Check for duplicate employee number
+    $check_emp = $conn->prepare("SELECT employee_number FROM admin_users WHERE employee_number = ?");
+    $check_emp->bind_param("s", $employee_number);
+    $check_emp->execute();
+    $check_emp->store_result();
+
+    $employee_number = strtoupper(trim($_POST['employee_number']));
+
+    if (!preg_match('/^\d+$/', $employee_number)) {
+    echo "<div class='error'>Employee number must contain numbers only.</div>";
+    return;
+    }
+
+    $check_emp->close();
 
     $check = $conn->query("SELECT email, contact_number FROM admin_users");
     while ($row = $check->fetch_assoc()) {
@@ -204,11 +253,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($email === $decrypted_email) {
             echo "<div class='error'>Email already registered.</div>";
-            $conn->close(); exit;
+            $conn->close(); return;
         }
+
         if ($contact_number === $decrypted_contact) {
             echo "<div class='error'>Contact number already registered.</div>";
-            $conn->close(); exit;
+            $conn->close(); return;
         }
     }
 
@@ -224,13 +274,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             alert('Admin registration successful! OTP for testing: $otp');
             window.location.href = 'verify_otp_admin.php';
         </script>";
-    } else {
-        echo "<div class='error'>Error: " . $stmt->error . "</div>";
+    }
+    if (str_contains($stmt->error, 'Duplicate entry') && str_contains($stmt->error, 'employee_number')) {
+    echo "<div class='error'>Employee number already exists. Please use another one.</div>";
+} else {
+    echo "<div class='error'>Registration failed: " . htmlspecialchars($stmt->error) . "</div>";
+}
     }
 
     $stmt->close();
     $conn->close();
-}
 ?>
 </div>
 </body>
