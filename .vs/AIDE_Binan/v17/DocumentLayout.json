@@ -54,8 +54,7 @@
               "RelativeToolTip": "system\\index.php",
               "ViewState": "AgIAABcAAAAAAAAAAAAmwI4AAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2025-06-19T11:01:04.422Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-19T11:01:04.422Z"
             },
             {
               "$type": "Document",
@@ -67,8 +66,7 @@
               "RelativeToolTip": "rider\\login_otp_rider.php",
               "ViewState": "AgIAAE4AAAAAAAAAAAAAAGIAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2025-06-19T11:00:21.471Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-19T11:00:21.471Z"
             },
             {
               "$type": "Document",
@@ -80,8 +78,7 @@
               "RelativeToolTip": "ai\\violation_rider.php",
               "ViewState": "AgIAAF0AAAAAAAAAAAAAAGgAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2025-06-19T10:58:36.974Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-19T10:58:36.974Z"
             },
             {
               "$type": "Document",
@@ -106,8 +103,7 @@
               "RelativeToolTip": "rider\\dashboard_rider.php",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2025-06-19T10:27:24.656Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-19T10:27:24.656Z"
             },
             {
               "$type": "Document",
@@ -119,8 +115,7 @@
               "RelativeToolTip": "ai\\violation.php",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAG0AAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2025-06-19T10:22:31.517Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-19T10:22:31.517Z"
             },
             {
               "$type": "Document",
@@ -132,8 +127,7 @@
               "RelativeToolTip": "admin\\dashboard_admin.php",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
-              "WhenOpened": "2025-06-19T10:21:57.729Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-19T10:21:57.729Z"
             }
           ]
         }

@@ -112,12 +112,17 @@ $conn->close();
         .sidebar ul li {
             padding: 14px 20px;
             font-weight: 500;
-            cursor: pointer;
         }
 
         .sidebar ul li:hover {
             background: #ef4444;
             transition: 0.3s;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
         }
 
         .main {
@@ -196,10 +201,10 @@ $conn->close();
 <div class="container">
     <div class="sidebar">
         <ul>
-            <li>E-Bike Laws</li>
-            <li>Penalty</li>
-            <li>Notifications</li>
-            <li>About</li>
+            <li><a href="#">E-Bike Laws</a></li>
+            <li><a href="../ai/violation_rider.php">My Violation</a></li>
+            <li><a href="#">Notifications</a></li>
+            <li><a href="#">About</a></li>
         </ul>
     </div>
 
@@ -238,6 +243,5 @@ $conn->close();
         </div>
     </div>
 </div>
-
 </body>
 </html>

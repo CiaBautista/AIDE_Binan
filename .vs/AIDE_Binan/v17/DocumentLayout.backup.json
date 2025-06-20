@@ -1,7 +1,36 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\system\\register.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:system\\register.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\system\\index.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:system\\index.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\rider\\login_otp_rider.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:rider\\login_otp_rider.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\rider\\dashboard_rider.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:rider\\dashboard_rider.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\ai\\violation.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ai\\violation.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\ai\\violation_rider.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ai\\violation_rider.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\admin\\dashboard_admin.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:admin\\dashboard_admin.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +38,102 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "index.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\system\\index.php",
+              "RelativeDocumentMoniker": "system\\index.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\system\\index.php",
+              "RelativeToolTip": "system\\index.php",
+              "ViewState": "AgIAABcAAAAAAAAAAAAmwI4AAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T11:01:04.422Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "login_otp_rider.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\rider\\login_otp_rider.php",
+              "RelativeDocumentMoniker": "rider\\login_otp_rider.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\rider\\login_otp_rider.php",
+              "RelativeToolTip": "rider\\login_otp_rider.php",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAGIAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T11:00:21.471Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "violation_rider.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\ai\\violation_rider.php",
+              "RelativeDocumentMoniker": "ai\\violation_rider.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\ai\\violation_rider.php",
+              "RelativeToolTip": "ai\\violation_rider.php",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAAAGgAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T10:58:36.974Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "register.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\system\\register.php",
+              "RelativeDocumentMoniker": "system\\register.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\system\\register.php",
+              "RelativeToolTip": "system\\register.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T10:40:43.842Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "dashboard_rider.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\rider\\dashboard_rider.php",
+              "RelativeDocumentMoniker": "rider\\dashboard_rider.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\rider\\dashboard_rider.php",
+              "RelativeToolTip": "rider\\dashboard_rider.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T10:27:24.656Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "violation.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\ai\\violation.php",
+              "RelativeDocumentMoniker": "ai\\violation.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\ai\\violation.php",
+              "RelativeToolTip": "ai\\violation.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAG0AAABKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T10:22:31.517Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "dashboard_admin.php",
+              "DocumentMoniker": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\admin\\dashboard_admin.php",
+              "RelativeDocumentMoniker": "admin\\dashboard_admin.php",
+              "ToolTip": "C:\\Users\\Jethro L. Sarmiento\\source\\repos\\AIDE_Binan\\admin\\dashboard_admin.php",
+              "RelativeToolTip": "admin\\dashboard_admin.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002338|",
+              "WhenOpened": "2025-06-19T10:21:57.729Z",
+              "EditorCaption": ""
             }
           ]
         }

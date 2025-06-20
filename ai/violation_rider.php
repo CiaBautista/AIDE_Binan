@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once '../db.php';
 
@@ -25,81 +25,174 @@ if ($plate) {
         $violations[] = $row;
     }
 }
+
+function formatViolation($row) {
+    $violations = [];
+    if ($row['no_helmet']) $violations[] = 'No Helmet';
+    if ($row['no_side_mirror']) $violations[] = 'No Side Mirror';
+    if ($row['fake_plate']) $violations[] = 'Fake/Tampered Plate';
+    if ($row['unregistered']) $violations[] = 'Unregistered';
+    if ($row['expired_registration']) $violations[] = 'Expired Registration';
+    return implode(', ', $violations);
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>My Violations</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            background: #f9fafb;
-            padding: 20px;
+            background: #fef2f2;
         }
-        h2 {
-            color: #dc2626;
+
+        header {
+            background: #7f1d1d;
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
+        .logo {
+            font-weight: bold;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #b91c1c;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #991b1b;
+        }
+
+        .main {
+            padding: 30px;
+        }
+
+        h2.page-title {
+            color: #7f1d1d;
+            text-align: center;
+            margin: 0 0 30px;
+            font-size: 28px;
+        }
+
+        .table-container {
+            max-height: 500px; 
+            overflow-y: auto;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #fff;
+            background: white;
         }
+
         th, td {
-            border: 1px solid #e5e7eb;
-            padding: 8px;
-            text-align: left;
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: center;
         }
+
         th {
+            background-color: #991b1b;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tr.unregistered {
             background-color: #f3f4f6;
+            color: #6b7280;
+        }
+
+        img {
+            max-width: 100px;
+            height: auto;
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #991b1b;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-<h2>My Violation Records</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Plate</th>
-            <th>Model</th>
-            <th>Color</th>
-            <th>Type</th>
-            <th>Violation(s)</th>
-            <th>Date & Time</th>
-            <th>Status</th>
-            <th>Image</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (!empty($violations)): ?>
-            <?php foreach ($violations as $v): ?>
-            <tr>
-                <td><?= htmlspecialchars($v['ebike_plate']) ?></td>
-                <td><?= htmlspecialchars($v['ebike_model']) ?></td>
-                <td><?= htmlspecialchars($v['ebike_color']) ?></td>
-                <td><?= htmlspecialchars($v['ebike_type']) ?></td>
-                <td>
-                    <?= $v['no_helmet'] ? 'No Helmet<br>' : '' ?>
-                    <?= $v['no_side_mirror'] ? 'No Side Mirror<br>' : '' ?>
-                    <?= $v['fake_plate'] ? 'Fake Plate<br>' : '' ?>
-                    <?= $v['expired_registration'] ? 'Expired Registration<br>' : '' ?>
-                    <?= $v['unregistered'] ? 'Unregistered<br>' : '' ?>
-                    <?= (!$v['no_helmet'] && !$v['no_side_mirror'] && !$v['fake_plate'] && !$v['expired_registration'] && !$v['unregistered']) ? 'N/A' : '' ?>
-                </td>
-                <td><?= htmlspecialchars($v['detected_at']) ?></td>
-                <td><?= isset($v['payment_status']) ? htmlspecialchars($v['payment_status']) : 'Not Paid' ?></td>
-                <td><img src="<?= htmlspecialchars($v['image_path']) ?>" style="max-width:100px;"></td>
-            </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="8" style="text-align:center;">N/A</td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+<header>
+    <div class="logo">🛵 A.I.D.E. BIÑAN</div>
+    <a href="../rider/dashboard_rider.php" class="back-btn">⬅ Back to Dashboard</a>
+</header>
 
-<br><a href="dashboard_rider.php">Dashboard</a>
+<div class="main">
+    <h2 class="page-title">My Violation Records</h2>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Plate</th>
+                    <th>Model</th>
+                    <th>Color</th>
+                    <th>Type</th>
+                    <th>Violation(s)</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($violations)): ?>
+                    <?php foreach ($violations as $v): ?>
+                        <tr class="<?= $v['unregistered'] ? 'unregistered' : '' ?>">
+                            <td><?= htmlspecialchars($v['ebike_plate']) ?></td>
+                            <td><?= htmlspecialchars($v['ebike_model']) ?></td>
+                            <td><?= htmlspecialchars($v['ebike_color']) ?></td>
+                            <td><?= htmlspecialchars($v['ebike_type']) ?></td>
+                            <td><?= formatViolation($v) ?: 'N/A' ?></td>
+                            <td><?= htmlspecialchars($v['detected_at']) ?></td>
+                            <td><?= isset($v['payment_status']) ? htmlspecialchars($v['payment_status']) : 'Not Paid' ?></td>
+                            <td>
+                                <?php if (!empty($v['image_path'])): ?>
+                                    <img src="<?= htmlspecialchars($v['image_path']) ?>" alt="Evidence">
+                                <?php else: ?>
+                                    <em>No image</em>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="8"><em>No violation records found.</em></td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 </body>
 </html>
