@@ -25,6 +25,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Count registered riders
+$countResult = $conn->query("SELECT COUNT(*) as total FROM rider_users");
+$countRow = $countResult->fetch_assoc();
+$total_riders = $countRow['total'] ?? 0;
+
 $query = "SELECT * FROM admin_users";
 $result = $conn->query($query);
 
@@ -46,7 +51,6 @@ if (!$admin) {
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -231,7 +235,7 @@ $conn->close();
             </div>
             <div class="summary-box">
                 <h3>Registered Riders</h3>
-                <p>1,560</p>
+                <p><?= $total_riders ?></p>
             </div>
             <div class="summary-box">
                 <h3>Total Penalties</h3>

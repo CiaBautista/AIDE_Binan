@@ -2,18 +2,41 @@
 session_start();
 require_once '../db.php';
 
-if (!isset($_SESSION['rider_email'])) {
+if (!isset($_SESSION['rider_email']) && !isset($_SESSION['admin_email'])) {
     header("Location: login_rider.php");
     exit();
 }
 
-$email = $_SESSION['rider_email'];
-$stmt = $conn->prepare("SELECT ebike_plate FROM rider_users WHERE email = ?");
-$stmt->bind_param('s', $email);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$plate = $user['ebike_plate'] ?? '';
+// Decrypt function (same as in dashboard)
+function decrypt_data($encrypted_data, $key) {
+    $data = base64_decode($encrypted_data);
+    $iv = substr($data, 0, 16);
+    $iv = str_pad($iv, 16, "\0");
+    $ciphertext = substr($data, 16);
+    return openssl_decrypt($ciphertext, 'AES-256-CBC', $key, 0, $iv);
+}
+
+$encryption_key = "your-strong-secret-key";
+$plate = '';
+
+// Admin view (via GET param)
+if (isset($_GET['plate'])) {
+    $plate = $_GET['plate'];
+} else {
+    // Rider view using decrypted email
+    if (!isset($_SESSION['rider_email'])) {
+        header("Location: login_rider.php");
+        exit();
+    }
+    $email = $_SESSION['rider_email'];
+    $stmt = $conn->query("SELECT ebike_plate, email FROM rider_users");
+    while ($row = $stmt->fetch_assoc()) {
+        if (decrypt_data($row['email'], $encryption_key) === $email) {
+            $plate = $row['ebike_plate'];
+            break;
+        }
+    }
+}
 
 $violations = [];
 if ($plate) {
@@ -144,7 +167,11 @@ function formatViolation($row) {
 
 <header>
     <div class="logo">🛵 A.I.D.E. BIÑAN</div>
-    <a href="../rider/dashboard_rider.php" class="back-btn">⬅ Back to Dashboard</a>
+    <?php if (isset($_SESSION['admin_email'])): ?>
+        <a href="/AIDE_Binan/admin/dashboard_admin.php" class="back-btn">⬅ Back to Dashboard</a>
+    <?php else: ?>
+        <a href="../rider/dashboard_rider.php" class="back-btn">⬅ Back to Dashboard</a>
+    <?php endif; ?>
 </header>
 
 <div class="main">
